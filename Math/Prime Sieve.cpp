@@ -67,6 +67,8 @@ vector<pii> large_factorization(ll n){
 		ans.pb(mp(p, cnt));
 	}
 
+	if (n > 1) ans.pb(mp(n, 1));
+
 	return ans;
 }
 
