@@ -1,6 +1,11 @@
-// Source : https://cses.fi/problemset/task/1651/
+// Source : 
 #include <bits/stdc++.h>
 using namespace std;
+
+#include <ext/pb_ds/assoc_container.hpp> 
+#include <ext/pb_ds/tree_policy.hpp> 
+using namespace __gnu_pbds;
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
 
 #define FOR(i,a,b) for (int i=(a),_b=(b);i<=_b;i=i+1)
 #define FORD(i,b,a) for (int i=(b),_a=(a);i>=_a;i=i-1)
@@ -24,47 +29,12 @@ template<class T> bool minimize(T &a, T b){ return (a > (b) ? a = (b), 1 : 0); }
 template<class T> bool maximize(T &a, T b){ return (a < (b) ? a = (b), 1 : 0); }
 template<class T> T Abs(const T &x) { return (x<0?-x:x);}
 
-const int N = 2e5 + 5;
+const int N = 1e5 + 5;
 const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
 
-int n, q;
- 
-ll bit1[N], bit2[N];
- 
-void update(int x, ll val){
-	for(int p = x; p <= n; p += p & (-p)){
-		bit1[p] += val;
-		bit2[p] += 1ll * val * x;
-	}
-}
-ll query(int x){
-	ll ans1 = 0, ans2 = 0;
-	for(int p = x; p > 0; p -= p & (-p)){
-		ans1 += bit1[p];
-		ans2 += bit2[p];
-	} 
-	return 1ll * ans1 * (x + 1) - ans2;
-}
-void add(int l, int r, int val){
-	update(l, val); 
-	update(r + 1, -val);
-}
-void solve(void){
-	while(q--){
-		int t; cin >> t;
-		if (t == 2){
-			int k; cin >> k;
-			cout << query(k) - query(k - 1) << endl;
-		}
-		else{
-			int l, r, val; cin >> l >> r >> val;
-			add(l, r, val);
-		}
-	}
-}
 signed main(){
  	ios_base::sync_with_stdio(0);
 	cin.tie(0); cout.tie(0);
@@ -75,19 +45,23 @@ signed main(){
    		freopen(NAME".out", "w", stdout);
 	}
 
-	bool multiTest = 0;
-	int numTest = 1;
+	ordered_set X;
+    X.insert(1);
+    X.insert(2);
+    X.insert(4);
+    X.insert(8);
+    X.insert(16);
 
-	if (multiTest) cin >> numTest;
-	while(numTest--){
-		cin >> n >> q;
-		FOR(i, 1, n){
-			int x; cin >> x;
-			add(i, i, x);
-		}
+    cout << *X.find_by_order(1) << el; // 2
+    cout << *X.find_by_order(2) << el; // 4
+    cout << *X.find_by_order(4) << el; // 16
+    cout <<(end(X) == X.find_by_order(6)) << el; // true
 
-		solve();
-	}
+    cout << X.order_of_key(-5) << el;  // 0
+    cout << X.order_of_key(1) << el;   // 0
+    cout << X.order_of_key(3) << el;   // 2
+    cout << X.order_of_key(4) << el;   // 2
+    cout << X.order_of_key(400) << el; // 5
 
 	cerr << "\nTime used: " << clock() << "ms\n";
 	return 0;

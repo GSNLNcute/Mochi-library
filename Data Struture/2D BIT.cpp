@@ -1,4 +1,4 @@
-// Source : https://cses.fi/problemset/task/1651/
+// Source : https://lqdoj.edu.vn/problem/forest5
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -24,46 +24,42 @@ template<class T> bool minimize(T &a, T b){ return (a > (b) ? a = (b), 1 : 0); }
 template<class T> bool maximize(T &a, T b){ return (a < (b) ? a = (b), 1 : 0); }
 template<class T> T Abs(const T &x) { return (x<0?-x:x);}
 
-const int N = 2e5 + 5;
+const int N = 1e3 + 5;
 const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
 
-int n, q;
- 
-ll bit1[N], bit2[N];
- 
-void update(int x, ll val){
-	for(int p = x; p <= n; p += p & (-p)){
-		bit1[p] += val;
-		bit2[p] += 1ll * val * x;
-	}
+int n, m, q;
+
+ll BIT[4][N][N]; 
+
+void update(int u, int v, int x){
+    for(int i = u; i <= n; i += i & (-i))
+        for(int j = v; j <= m; j += j & (-j)){
+            BIT[0][i][j] += x;
+            BIT[1][i][j] += u * x;
+            BIT[2][i][j] += v * x;
+            BIT[3][i][j] += u * v * x;
+        }
 }
-ll query(int x){
-	ll ans1 = 0, ans2 = 0;
-	for(int p = x; p > 0; p -= p & (-p)){
-		ans1 += bit1[p];
-		ans2 += bit2[p];
-	} 
-	return 1ll * ans1 * (x + 1) - ans2;
+void add(int x, int y, int u, int v, int val){
+    update(x, y, val);
+    update(x, v + 1, -val);
+    update(u + 1, y, -val);
+    update(u + 1, v + 1, val);
 }
-void add(int l, int r, int val){
-	update(l, val); 
-	update(r + 1, -val);
+ll get(int u, int v){
+    ll a[4] = {0, 0, 0, 0};
+    REP(type, 4){
+        for(int i = u; i > 0; i -= i & (-i))
+            for(int j = v; j > 0; j -= j & (-j))
+                a[type] += BIT[type][i][j];
+    }
+    return 1ll * a[0] * (u + 1) * (v + 1) - a[1] * (v + 1) - a[2] * (u + 1) + a[3];
 }
-void solve(void){
-	while(q--){
-		int t; cin >> t;
-		if (t == 2){
-			int k; cin >> k;
-			cout << query(k) - query(k - 1) << endl;
-		}
-		else{
-			int l, r, val; cin >> l >> r >> val;
-			add(l, r, val);
-		}
-	}
+ll query(int x, int y, int u, int v){
+	return get(u, v) - get(x - 1, v) - get(u, y - 1) + get(x - 1, y - 1) + 1ll * (u - x + 1) * (v - y + 1);
 }
 signed main(){
  	ios_base::sync_with_stdio(0);
@@ -80,13 +76,17 @@ signed main(){
 
 	if (multiTest) cin >> numTest;
 	while(numTest--){
-		cin >> n >> q;
-		FOR(i, 1, n){
-			int x; cin >> x;
-			add(i, i, x);
+		cin >> n >> m >> q;
+		while(q--){
+			int type; cin >> type;
+			if (type == 1){
+				int x, y, u, v, val; cin >> x >> y >> u >> v >> val;
+				add(x, y, u, v, val);
+			} else{
+				int x, y, u, v; cin >> x >> y >> u >> v;
+				cout << query(x, y, u, v) << el;
+			}
 		}
-
-		solve();
 	}
 
 	cerr << "\nTime used: " << clock() << "ms\n";

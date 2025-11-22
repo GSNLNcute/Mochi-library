@@ -1,4 +1,4 @@
-// Source : https://cses.fi/problemset/task/1651/
+// Source : https://www.spoj.com/problems/MKTHNUM/
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -24,45 +24,53 @@ template<class T> bool minimize(T &a, T b){ return (a > (b) ? a = (b), 1 : 0); }
 template<class T> bool maximize(T &a, T b){ return (a < (b) ? a = (b), 1 : 0); }
 template<class T> T Abs(const T &x) { return (x<0?-x:x);}
 
-const int N = 2e5 + 5;
+const int N = 1e5 + 5;
 const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
 
-int n, q;
- 
-ll bit1[N], bit2[N];
- 
-void update(int x, ll val){
-	for(int p = x; p <= n; p += p & (-p)){
-		bit1[p] += val;
-		bit2[p] += 1ll * val * x;
-	}
+int n, q, a[N];
+
+ve <pii> bit[N];
+
+void update(int p, int val, int t){
+	for(; p <= n; p += p & (-p))
+		bit[p].pb(bit[p].empty() ? mp(t, val) : mp(t, val + bit[p].back().se));
 }
-ll query(int x){
-	ll ans1 = 0, ans2 = 0;
-	for(int p = x; p > 0; p -= p & (-p)){
-		ans1 += bit1[p];
-		ans2 += bit2[p];
-	} 
-	return 1ll * ans1 * (x + 1) - ans2;
-}
-void add(int l, int r, int val){
-	update(l, val); 
-	update(r + 1, -val);
-}
-void solve(void){
-	while(q--){
-		int t; cin >> t;
-		if (t == 2){
-			int k; cin >> k;
-			cout << query(k) - query(k - 1) << endl;
-		}
+int get(int p, int t){
+	int ans = 0;
+	for(; p > 0; p -= p & (-p)) if (!bit[p].empty()){
+		if (bit[p].back().fi <= t) ans += bit[p].back().se;
 		else{
-			int l, r, val; cin >> l >> r >> val;
-			add(l, r, val);
+			int j = upper_bound(bit[p].begin(), bit[p].end(), mp(t, inf)) - bit[p].begin() - 1;
+			if (j >= 0) ans += bit[p][j].se;
 		}
+	}
+	return ans;
+}
+int query(int l, int r, int t){
+	return get(r, t) - get(l - 1, t);
+}
+void solve(){
+	vi ord(n); iota(ord.begin(), ord.end(), 1);
+	sort(ord.begin(), ord.end(), [](const int& u, const int& v){
+		return a[u] < a[v];
+	});
+	REP(i, n) update(ord[i], 1, i); 
+
+	while(q--){
+		int l, r, k; cin >> l >> r >> k;
+		assert(k <= r - l + 1);
+
+		int lo = 0, hi = n - 1, res = -1;
+		while(lo <= hi){
+			int mid = (lo + hi) >> 1;
+			if (query(l, r, mid) >= k) res = a[ord[mid]], hi = mid - 1;
+			else lo = mid + 1; 
+		}
+
+		cout << res << el;
 	}
 }
 signed main(){
@@ -81,11 +89,7 @@ signed main(){
 	if (multiTest) cin >> numTest;
 	while(numTest--){
 		cin >> n >> q;
-		FOR(i, 1, n){
-			int x; cin >> x;
-			add(i, i, x);
-		}
-
+		FOR(i, 1, n) cin >> a[i];
 		solve();
 	}
 
