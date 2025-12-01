@@ -1,4 +1,4 @@
-// Source : https://cses.fi/problemset/task/1654
+// Source : https://cses.fi/problemset/task/1696
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -24,29 +24,44 @@ template<class T> bool minimize(T &a, T b){ return (a > (b) ? a = (b), 1 : 0); }
 template<class T> bool maximize(T &a, T b){ return (a < (b) ? a = (b), 1 : 0); }
 template<class T> T Abs(const T &x) { return (x<0?-x:x);}
 
-const int N = 2e5 + 5;
-const int LG = 20;
+const int N = 500 + 5;
+const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
 
-int n, a[N];
+int n, m, k;
 
-int f1[MASK(LG) + 5];
-int f2[MASK(LG) + 5];
+vi g[N];
+int seen[N], iteration = 0;
+int matchL[N], matchR[N];
 
+bool kuhn(int u){
+    if(seen[u] == iteration) return 0;
+    seen[u] = iteration;
+
+    for(const int& v : g[u]){
+        if(matchR[v] == -1 || kuhn(matchR[v])){
+            matchL[u] = v; matchR[v] = u;
+            return 1;
+        }
+    }
+    return 0;
+}
 void solve(){
-	FOR(i, 1, n){
-		f1[a[i]]++;
-		f2[a[i]]++;
-	}
+	FOR(i, 1, n) matchL[i] = -1;
+	FOR(i, 1, m) matchR[i] = -1;
 
-	REP(i, LG) FOR(mask, 0, MASK(LG) - 1) if (BIT(mask, i))
-		f1[mask] += f1[mask ^ MASK(i)];
-	REP(i, LG) FORD(mask, MASK(LG) - 1, 0) if (!BIT(mask, i))
-		f2[mask] += f2[mask ^ MASK(i)];
+	FOR(u, 1, n){
+       	++iteration;
+        kuhn(u);
+    }
 
-	FOR(i, 1, n) cout << f1[a[i]] << " " << f2[a[i]] << " " << n - f1[((MASK(LG) - 1) ^ a[i])] << el;
+    ve <pii> ans;
+    FOR(u, 1, n) if (matchL[u] != -1) ans.pb(mp(u, matchL[u]));
+
+    cout << (int) ans.size() << el;
+    for(const pii& res : ans) cout << res.fi << ' ' << res.se << el;
 }
 signed main(){
  	ios_base::sync_with_stdio(0);
@@ -63,8 +78,11 @@ signed main(){
 
 	if (multiTest) cin >> numTest;
 	while(numTest--){
-		cin >> n;
-		FOR(i, 1, n) cin >> a[i];
+		cin >> n >> m >> k;
+		FOR(i, 1, k){
+			int u, v; cin >> u >> v;
+			g[u].pb(v);
+		}
 		solve();
 	}
 

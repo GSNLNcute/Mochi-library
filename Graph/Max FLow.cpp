@@ -1,4 +1,4 @@
-// Source : https://cses.fi/problemset/task/1654
+// Source : https://oj.vnoi.info/problem/nkflow
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -24,29 +24,47 @@ template<class T> bool minimize(T &a, T b){ return (a > (b) ? a = (b), 1 : 0); }
 template<class T> bool maximize(T &a, T b){ return (a < (b) ? a = (b), 1 : 0); }
 template<class T> T Abs(const T &x) { return (x<0?-x:x);}
 
-const int N = 2e5 + 5;
-const int LG = 20;
+const int N = 1e3 + 5;
+const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
 
-int n, a[N];
+int n, m, S, T;
+int cap[N][N], flow[N][N];
+vi g[N];
 
-int f1[MASK(LG) + 5];
-int f2[MASK(LG) + 5];
+int pre[N];
 
-void solve(){
-	FOR(i, 1, n){
-		f1[a[i]]++;
-		f2[a[i]]++;
+bool find_path(){
+	memset(pre, 0, sizeof(pre)); pre[S] = -1;
+	queue <int> q; q.push(S);
+	while(!q.empty()){
+		int u = q.front(); q.pop();
+		for(const int& v : g[u]) if (!pre[v] && cap[u][v] > flow[u][v]){
+			pre[v] = u; q.push(v);
+		}
 	}
+	return pre[T] != 0;
+}
+void inc_path(){
+	int val = inf;
+	for(int u = T; u != S; u = pre[u]){
+		int p = pre[u];
+		val = min(val, cap[p][u] - flow[p][u]);
+	}
+	for(int u = T; u != S; u = pre[u]){
+		int p = pre[u];
+		flow[p][u] += val;
+		flow[u][p] -= val;
+	}
+}
+void solve(){
+	while(find_path()) inc_path();
 
-	REP(i, LG) FOR(mask, 0, MASK(LG) - 1) if (BIT(mask, i))
-		f1[mask] += f1[mask ^ MASK(i)];
-	REP(i, LG) FORD(mask, MASK(LG) - 1, 0) if (!BIT(mask, i))
-		f2[mask] += f2[mask ^ MASK(i)];
-
-	FOR(i, 1, n) cout << f1[a[i]] << " " << f2[a[i]] << " " << n - f1[((MASK(LG) - 1) ^ a[i])] << el;
+	ll ans = 0;
+	FOR(i, 1, n) ans += flow[i][T];
+	cout << ans;
 }
 signed main(){
  	ios_base::sync_with_stdio(0);
@@ -63,8 +81,12 @@ signed main(){
 
 	if (multiTest) cin >> numTest;
 	while(numTest--){
-		cin >> n;
-		FOR(i, 1, n) cin >> a[i];
+		cin >> n >> m >> S >> T;
+		FOR(i, 1, m){
+			int u, v, w; cin >> u >> v >> w;
+			g[u].pb(v); g[v].pb(u);
+			cap[u][v] += w;
+		}
 		solve();
 	}
 

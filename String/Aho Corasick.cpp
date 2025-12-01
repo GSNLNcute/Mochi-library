@@ -1,7 +1,7 @@
 // Source : https://cses.fi/problemset/task/2103
 #include <bits/stdc++.h>
 using namespace std;
-
+ 
 #define FOR(i,a,b) for (int i=(a),_b=(b);i<=_b;i=i+1)
 #define FORD(i,b,a) for (int i=(b),_a=(a);i>=_a;i=i-1)
 #define REP(i,n) for (int i=0,_n=(n);i<_n;i=i+1)
@@ -23,31 +23,101 @@ using namespace std;
 template<class T> bool minimize(T &a, T b){ return (a > (b) ? a = (b), 1 : 0); }
 template<class T> bool maximize(T &a, T b){ return (a < (b) ? a = (b), 1 : 0); }
 template<class T> T Abs(const T &x) { return (x<0?-x:x);}
-
+ 
 const int N = 1e5 + 5;
 const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
-
+ 
+string S;
+int n;
+string str[N];
+ 
+int cnt[N];
+ 
+struct Trie{
+	struct Node{
+		Node* child[26];
+		Node* fail;
+		Node* nxt[26];
+		vi found;
+ 
+		Node(){
+			REP(i, 26) child[i] = nullptr;
+			REP(i, 26) nxt[i] = nullptr;
+			fail = nullptr;
+			found.clear();
+		}
+	};
+	Node* root = new Node();
+ 
+	void add_string(const string& S, const int& id){
+		Node* cur = root;
+		for(const char& x : S){
+			int c = x - 'a'; 
+			if (cur->child[c] == nullptr) cur->child[c] = new Node();
+			cur = cur->child[c]; 
+		}
+		cur->found.pb(id);
+	}
+	void build(){
+		root->fail = root;
+		REP(i, 26) root->nxt[i] = root->child[i] != nullptr ? root->child[i] : root;
+ 
+		queue <Node*> q;
+    	q.push(root);
+ 
+	    while(!q.empty()) {
+	        Node *p = q.front(); q.pop();
+	        assert(p->fail != nullptr);
+	 
+	        REP(c, 26) if (p->child[c] != nullptr) {
+	            Node *cur = p->child[c];
+	 
+	            cur->fail = p == root ? root : p->fail->nxt[c];
+	            REP(c, 26) cur->nxt[c] = cur->child[c] != nullptr ? cur->child[c] : cur->fail->nxt[c];
+	            for (const int& x : cur->fail->found) cur->found.push_back(x);
+	 
+	            q.push(cur);
+	        }
+	    } 
+	}
+	void go(const string& S){
+		Node* cur = root;
+		for(const char& x : S){
+			cur = cur->nxt[x - 'a'];
+			for(const int& i : cur->found) cnt[i]++;
+		}
+	}
+} AC;
+ 
+void solve(){
+	FOR(i, 1, n) AC.add_string(str[i], i);
+	AC.build(); AC.go(S);
+ 
+	FOR(i, 1, n) cout << cnt[i] << el;
+}
 signed main(){
  	ios_base::sync_with_stdio(0);
 	cin.tie(0); cout.tie(0);
-
+ 
 	#define NAME "TASK"
 	if (fopen(NAME".inp", "r")){
 		freopen(NAME".inp", "r", stdin);
    		freopen(NAME".out", "w", stdout);
 	}
-
+ 
 	bool multiTest = 0;
 	int numTest = 1;
-
+ 
 	if (multiTest) cin >> numTest;
 	while(numTest--){
-		
+		cin >> S >> n;
+		FOR(i, 1, n) cin >> str[i];
+		solve();
 	}
-
+ 
 	cerr << "\nTime used: " << clock() << "ms\n";
 	return 0;
 }

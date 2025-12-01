@@ -1,4 +1,4 @@
-// Source : https://cses.fi/problemset/task/1654
+// Source : https://codeforces.com/contest/626/problem/F
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -24,29 +24,39 @@ template<class T> bool minimize(T &a, T b){ return (a > (b) ? a = (b), 1 : 0); }
 template<class T> bool maximize(T &a, T b){ return (a < (b) ? a = (b), 1 : 0); }
 template<class T> T Abs(const T &x) { return (x<0?-x:x);}
 
-const int N = 2e5 + 5;
-const int LG = 20;
+const int N = 200 + 5;
+const int K = 1000 + 5;
+const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
 
-int n, a[N];
+int n, k, a[N];
 
-int f1[MASK(LG) + 5];
-int f2[MASK(LG) + 5];
+int dp[N][N][K];
+// Xét tới người i, đang mở j đoạn, tổng giá trị là p
 
+void add(int& cur, const int& val){
+	cur += val; if (cur >= MOD) cur -= MOD;
+}
 void solve(){
-	FOR(i, 1, n){
-		f1[a[i]]++;
-		f2[a[i]]++;
+	sort(a + 1, a + n + 1);
+	// vì không cần chọn đoạn liên tiếp, không mất tính tổng quát, ta sort lại hết
+
+	memset(dp, 0, sizeof(dp)); dp[0][0][0] = 1;
+	REP(i, n) FOR(j, 0, n) FOR(t, 0, k) if (dp[i][j][t] > 0){
+		int val = t + (a[i + 1] - a[i]) * j; // mỗi đoạn đang mở được cộng thêm lượng (a[i + 1] - a[i])
+		if (val > k) continue;
+
+		add(dp[i + 1][j][val], dp[i][j][t]);                                      // a[i + 1] tách nhóm riêng
+		add(dp[i + 1][j][val], 1ll * j * dp[i][j][t] % MOD);                    // a[i + 1] vào một đoạn đang mở bất kì
+		if (j < n) add(dp[i + 1][j + 1][val], dp[i][j][t]);                       // a[i + 1] mở một đoạn
+		if (j > 0) add(dp[i + 1][j - 1][val], 1ll * j * dp[i][j][t] % MOD);     // a[i + 1] đóng một đoạn bất kì
 	}
 
-	REP(i, LG) FOR(mask, 0, MASK(LG) - 1) if (BIT(mask, i))
-		f1[mask] += f1[mask ^ MASK(i)];
-	REP(i, LG) FORD(mask, MASK(LG) - 1, 0) if (!BIT(mask, i))
-		f2[mask] += f2[mask ^ MASK(i)];
-
-	FOR(i, 1, n) cout << f1[a[i]] << " " << f2[a[i]] << " " << n - f1[((MASK(LG) - 1) ^ a[i])] << el;
+	int ans = 0;
+	FOR(t, 0, k) add(ans, dp[n][0][t]);
+	cout << ans;
 }
 signed main(){
  	ios_base::sync_with_stdio(0);
@@ -63,7 +73,7 @@ signed main(){
 
 	if (multiTest) cin >> numTest;
 	while(numTest--){
-		cin >> n;
+		cin >> n >> k;
 		FOR(i, 1, n) cin >> a[i];
 		solve();
 	}
