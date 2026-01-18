@@ -46,6 +46,15 @@ struct Matrix{
 		}
 		return res;
 	}
+	Matrix operator ^ (int b){
+		Matrix res(n, m), a = *this;
+		res.mt[1][1] = res.mt[2][2] = 1;
+		while(b > 0){
+			if (b & 1) res = res * a;
+			b >>= 1; a = a * a;
+		}
+		return res;
+	}
 } A[LG + 1];
 
 void process(){
