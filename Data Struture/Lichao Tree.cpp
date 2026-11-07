@@ -32,6 +32,16 @@ const int MOD = 1e9 + 7;
 
 const int ST = (1 << 18) + 7;
 
+// Tìm cực trị của các đường thẳng bậc 1 (ax + b) tại một hoành độ x truy vấn
+
+// Bài toán: Có n đồ vật xuất hiện ở n thời điểm tuyến tính, mang cân nặng w[i] và giá trị e[i]
+// Có thể chọn hoặc bỏ đồ vật thứ i
+// Nếu chọn: cân nặng thành w[i], năng lượng là e[i]
+// Di chuyển tới vật j: mất chi phí w * [x[i] - x[j]]
+// Ban đầu đứng ở 0, cân nặng 0, năng lượng 0
+// Di chuyển để không âm năng lượng
+// Cần quản lý cây Li Chao ĐOẠN thẳng, không phải đường thẳng
+
 vector <int> pos;
 int sz = 0;
 
@@ -63,6 +73,7 @@ void compress(){
 	sz = N;
 }
 // Maximum Lichao
+// Với Lichao đường thẳng, không cần truyền u, v
 void update(int id, int l, int r, int u, int v, line L){
 	if (v < l || r < u) return;
 	if (l == r){
@@ -93,8 +104,14 @@ ll get(int id, int l, int r, int x){
 void solve(){
 	compress();
 
+	FOR(i, 1, n) 
+
 	ll res = 0;
 	FOR(i, 1, n){
+
+		// FOR(j, 0, i - 1) if (dp[j] - w[j] * abs(x[i] - x[j]) > 0)
+		//	maximize(dp[i], dp[j] - w[j] * abs(x[i] - x[j]) + e[i])
+
 		dp[i] = get(1, 1, sz, getID(x[i])) + e[i];
 		res = max(res, dp[i]);
 
@@ -106,7 +123,6 @@ void solve(){
 
 	cout << res;
 }
-
 signed main(){
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);

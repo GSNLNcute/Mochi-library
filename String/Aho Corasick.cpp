@@ -29,6 +29,8 @@ const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
+
+// KMP as a tree
  
 string S;
 int n;

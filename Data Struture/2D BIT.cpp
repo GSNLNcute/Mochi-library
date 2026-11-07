@@ -32,8 +32,10 @@ const int MOD = 1e9 + 7;
 
 int n, m, q;
 
-ll BIT[4][N][N]; 
 
+ll BIT[4][N][N];
+// Query: add to sub-rectangular [(x, y), (u, v)]
+// Answer: sum in sub-rectangular  
 void update(int u, int v, int x){
     for(int i = u; i <= n; i += i & (-i))
         for(int j = v; j <= m; j += j & (-j)){

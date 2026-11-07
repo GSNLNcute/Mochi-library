@@ -36,6 +36,8 @@ ll sum1[N], sum2[N];
 
 ll dp[15][N];
 
+// Điều kiện áp dụng cost(a, c) + cost(b, d) <= cost(a, d) + cost(b, c) với a <= b <= c <= d
+// Khi đó opt(t, i) <= opt(t, i + 1)
 inline ll cost(const ll& l, const ll& r){
 	return (sum2[r] - sum2[l]) - 1ll * l * (sum1[r] - sum1[l]);
 }

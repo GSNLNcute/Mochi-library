@@ -30,6 +30,14 @@ const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
 
+// Thành phần song liên thông là tập đỉnh liên thông cực đại không tồn tại khớp (gọi tắt là khối)
+// Các khối này sẽ nén về một đỉnh đại diện 
+// Lưu ý: một đỉnh u có thể không là khớp khối B nhưng là khớp của toàn bộ đồ thị
+// Tập đỉnh V' = tập các điểm khớp + tập các khối
+// Tập cạnh E' = (u, B) sao cho u là khớp và u thuộc khối B
+// Tính chất: 1. là đồ thị 2 phía vì mọi cạnh chỉ nối một khớp với một khối;
+// 2. giữ nguyên tính liên thông với đồ thị gốc 
+
 int n, m, q;
 vi g[N];
 

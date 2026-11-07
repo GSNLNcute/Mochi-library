@@ -33,6 +33,11 @@ const int MOD = 1e9 + 7;
 struct CRT{
     int res;
 
+    // Giải hệ phương trình đồng dư tìm ẩn x
+    // x % p1 = r1 
+    // x % p2 = r2 
+    // ...
+
     CRT(){
         res = 0, prd = 1;
     }
@@ -42,6 +47,27 @@ struct CRT{
         res += mul(r - res % p + p, euclid(prd, p).fi + p, p) * prd;
         prd *= p;
         if (res >= prd) res -= prd;
+    }
+
+    // Add condition: res % p == r  (p KHÔNG cần nguyên tố cùng nhau)
+    // Sau khi gọi, prd = lcm các p đã thêm. Nếu vô nghiệm thì ok = false.
+    void _add(int p, int r){
+        if (!ok) return;
+        r %= p; if (r < 0) r += p;
+        int g = __gcd(prd, p);
+        int d = ((r - res) % p + p) % p;      // d = (r - res) mod p
+        if (d % g != 0){ ok = false; return; }
+        int m = p / g;                         // modulo mới sau khi chia g
+        int t = 0;
+        if (m > 1){
+            d /= g;
+            int inv = euclid((prd / g) % m, m).fi % m;
+            if (inv < 0) inv += m;
+            t = mul(d % m, inv, m);
+        }
+        res += prd * t;                        // prd * t < prd * m = lcm
+        prd = prd / g * p;
+        res %= prd;
     }
 
 	private:

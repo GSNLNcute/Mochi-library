@@ -185,6 +185,31 @@ vector<pair<ll, int>> factorize_pk(ll x) {
     return res;
 }
 
+ll phi(ll n) {
+    auto ps = factorize(n);
+    ll res = n;
+    ll last = -1;
+    for (auto p : ps) {
+        if (p != last) {
+            res = res / p * (p - 1);
+            last = p;
+        }
+    }
+    return res;
+}
+
+// Cấp của a mod m
+ll ord(ll a, ll m) {
+    if (gcd(a, m) != 1)
+        return -1;
+    ll res = phi(m);
+    auto ps = factorize(res);
+    for (auto p : ps)
+        if (powMod(a, res / p, m) == 1)
+            res /= p;
+    return res;
+}
+
 signed main(){
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);

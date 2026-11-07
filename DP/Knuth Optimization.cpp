@@ -1,4 +1,4 @@
-// Source : http://oj.vnoi.info/problem/lehoi
+// Source : 
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -24,105 +24,69 @@ template<class T> bool minimize(T &a, T b){ return (a > (b) ? a = (b), 1 : 0); }
 template<class T> bool maximize(T &a, T b){ return (a < (b) ? a = (b), 1 : 0); }
 template<class T> T Abs(const T &x) { return (x<0?-x:x);}
 
-const int N = 2e5 + 5;
+const int N = 1e3 + 5;
 const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 1e9 + 7;
 
-int n, k, a[N];
-ll sum[N];
+// Ban đầu có n nhóm, nhóm i có trọng số a[i]. 
+// Mỗi lần được chọn hai nhóm liền kề để gộp thành một nhóm, chi phí bằng tổng trọng số của hai nhóm đó.
+// Lặp lại đến khi còn một nhóm.
 
-struct Info{
-	int l, r, p;
-	Info(int _l = 0, int _r = 0, int _p = 0): l(_l), r(_r), p(_p) {}
-};
+int n, a[N];
 
-ll f[N];
-// h[i] là vị trí j nhỏ nhất thỏa f[j] + cost(j, i) đạt giá trị cực tiểu
+ll pre[N];
+ll dp[N][N];
+int opt[N][N];
 
-ll cost(int l, int r){
-	// hàm cost phải thỏa mãn bđt tứ giác: cost(a, c) + cost(b, d) <= cost(a, d) + cost(b, c)
-	if (l >= r) return 0ll;
-	l++;
-	int d = (r - l + 1) / 2;
-	ll R = sum[r] - sum[r - d];
-	ll L = sum[l + d - 1] - sum[l - 1];
-	return R - L;
-}
-void knuth(){
-	deque <Info> dq;
-  dq.push_back(Info(1, n, 0));
-
- 	FOR(i, 1, n){
-	 	f[i] = k + f[dq.front().p] + cost(dq.front().p, i);
-	  // deque chỉ lưu giá trị từ h[i + 1] tới h[n]
-	  ++dq.front().l;
-
-    // nếu l > r, ta loại đoạn này khỏi deque
-    if (dq.front().l > dq.front().r) dq.pop_front();
-
-    while (!dq.empty()) {
-      	auto [l, r, p] = dq.back();
-      	if (f[i] + cost(i, l) < f[p] + cost(p, l)) dq.pop_back();
-      	// p không còn là giá trị của h[l], h[l + 1], ..., h[r]
-      	// lúc này, h[l] = h[l + 1] = ... = h[r] = i
-      	else break;
-    }
-
-    if (dq.empty()) dq.push_back(Info(i + 1, n, i));
-    // h[i + 1] = h[i + 2] = ... = h[n] = i
-   
-    else{
-   		// tìm nhị phân vị trí pos nhỏ nhất thỏa mãn h[pos] = i
-    	auto& [l, r, p] = dq.back();
-      int low = l, high = r, pos = r + 1, mid;
-      while (low <= high){
-        mid = (low + high) >> 1;
-        if (f[i] + cost(i, mid) < f[p] + cost(p, mid))
-          pos = mid, high = mid - 1;
-        else low = mid + 1;
-      }
-
-      // cập nhật đoạn (l, r, p) thành (l, pos - 1, p)
-      r = pos - 1;
-      if (pos <= n) dq.push_back(Info(pos, n, i));
-      // h[pos] = h[pos + 1] = ... = h[n] = i
-    }
-  }
+inline ll cost(const int& i, const int& j){
+	return pre[j] - pre[i - 1];
+	// Hàm cost phải thỏa cả bất tứ giác và tính đơn điệu
+	// a <= b <= c <= d
+	// cost(b, c) <= cost(a, d)
+	// cost(a, c) + cost(b, d) <= cost(a, d) + cost(b, c)
 }
 void solve(){
-	FOR(i, 1, n) sum[i] = sum[i - 1] + a[i];
+    FOR(i, 1, n) pre[i] = pre[i - 1] + a[i];
 
-	memset(f, 0x3f, sizeof(f)); f[0] = 0;
+    // FOR(len, 2, n) FOR(i, 1, n - len + 1){
+    //     int j = i + len - 1;
+    //     FOR(k, i, j - 1) minimize(dp[i][j], dp[i][k] + dp[k+1][j] + cost(i, j));
+    // }
 
-	// FOR(i, 1, n) FOR(j, 0, i - 1)
-	// 	minimize(f[i], k + f[j] + cost(j, i));
+    FORD(i, n, 1){
+        dp[i][i] = 0; opt[i][i] = i;
+        FOR(j, i + 1, n){
+            dp[i][j] = INF;
+            FOR(k, opt[i][j - 1], min(j - 1, opt[i + 1][j]))
+                if(minimize(dp[i][j], dp[i][k] + dp[k + 1][j] + cost(i, j)))
+                    opt[i][j] = k;
+        }
+    }
 
-	knuth();
-	cout << f[n];
+    cout << dp[1][n] << el;
 }
 signed main(){
- 	ios_base::sync_with_stdio(0);
-	cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0); cout.tie(0);
 
-	#define NAME "TASK"
-	if (fopen(NAME".inp", "r")){
-		freopen(NAME".inp", "r", stdin);
-   		freopen(NAME".out", "w", stdout);
-	}
+    #define NAME "Knuth Optimization"
+    if (fopen(NAME".inp", "r")){
+        freopen(NAME".inp", "r", stdin);
+        freopen(NAME".out", "w", stdout);
+    }
 
-	bool multiTest = 0;
-	int numTest = 1;
+    bool multiTest = 0;
+    int numTest = 1;
 
-	if (multiTest) cin >> numTest;
-	while(numTest--){
-		cin >> n >> k;
-		FOR(i, 1, n) cin >> a[i];
+    if (multiTest) cin >> numTest;
+    while(numTest--){
+        cin >> n;
+        FOR(i, 1, n) cin >> a[i];
+        solve();
+    }
 
-		solve(); 
-	}
-
-	cerr << "\nTime used: " << clock() << "ms\n";
-	return 0;
+    cerr << "\nTime used: " << clock() << "ms\n";
+    return 0;
 }

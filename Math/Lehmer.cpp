@@ -28,6 +28,7 @@ const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 
+// Đếm số nguyên tố O(sqrt(n))
 
 // Đặt S(v, p): số các số trên sàng eratosthenes sau khi đã áp dụng sàng với các số nguyên tố nhỏ hơn hoặc bằng p
 // Vậy S(v, p): số các số hoặc là số nguyên tố hoặc là hợp số nhưng các ước của nó lớn hơn p

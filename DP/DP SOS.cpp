@@ -41,6 +41,8 @@ void solve(){
 		f2[a[i]]++;
 	}
 
+	// f1: sum over subset (tổng tập con)
+	// f2: sum over superset (tổng tập cha)
 	REP(i, LG) FOR(mask, 0, MASK(LG) - 1) if (BIT(mask, i))
 		f1[mask] += f1[mask ^ MASK(i)];
 	REP(i, LG) FORD(mask, MASK(LG) - 1, 0) if (!BIT(mask, i))

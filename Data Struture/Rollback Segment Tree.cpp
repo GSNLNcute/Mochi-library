@@ -32,6 +32,10 @@ const int MOD = 1e9 + 7;
 
 int n, m, k;
 
+// Cho một cấu hình ảnh hưởng trong khoảng thời gian [L, R]
+// Add cấu hình này vào cây IT tại các nút biểu diễn [L, R] và xóa nó sau đó
+// Có thể hoạt động với bất kì CTDL nào revert lại được
+
 ve <pii> it[(1 << 18) + 3];
 
 int par[N], sz[N];

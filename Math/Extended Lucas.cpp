@@ -30,6 +30,9 @@ const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 const int MOD = 142857;
 
+// Tính C(n, k) với modulo không nguyên tố
+// VD: tính với MOD = 142857
+
 const int n_primes = 4;
 int primes[] = {3, 11, 13, 37};
 int primes_pw[] = {27, 11, 13, 37};

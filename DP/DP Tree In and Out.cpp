@@ -29,6 +29,9 @@ const int LG = 17;
 const ll INF = 1e17 + 7;
 const int inf = 1e9 + 7;
 
+// Khung này sẽ sử dụng cho cái bài cần dpIn[] và dpOut
+// Ý tưởng tương tự khi ta dp reroot 
+
 int n, MOD;
 vi g[N], child[N];
 

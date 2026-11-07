@@ -32,6 +32,8 @@ const int MOD = 1e9 + 7;
 
 int n, q, a[N];
 
+// Giải bài toán các truy vấn trên cây IT nhưng tại thời điểm k
+
 struct Node{
 	int lf, rt;
 	ll val;

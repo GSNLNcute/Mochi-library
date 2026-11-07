@@ -51,6 +51,7 @@ int d[N][N], f[N][N];
 pii trace[N][N];
 
 int ans[M];
+// Số cặp (u, v) nhận cạnh i là đường đi ngắn nhất
 
 inline void dijiktras(const int& S){
 	priority_queue <Info> pq; pq.push(Info(S, 0));
@@ -88,10 +89,11 @@ void solve(){
 
 	        if(d[x][u] + e[id].w + d[v][y] == d[x][y]){
 	        	if (1ll * f[x][u] * f[v][y] % MOD == f[x][y]) ans[id]++;
+	        	// Nếu if này đúng, thì ta dựng được 1 cạnh DAG (u, v) trong shortest path xuất phát từ x
 	        }
 	        if(d[x][v] + e[id].w + d[u][y] == d[x][y]){
 	        	if (1ll * f[x][v] * f[u][y] % MOD == f[x][y]) ans[id]++;
-	        }	
+	        }
 
 			u = v; if (u == x) break;
 		}
